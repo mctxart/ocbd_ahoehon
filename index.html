@@ -6,40 +6,102 @@
     <title>My Picture Book</title>
     <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
     <style>
-        body { background: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { width: 80%; height: 80%; }
-        .page { background-size: cover; background-color: white; border: 1px solid #ccc; }
-        /* めくる時の影などの調整 */
-        .page-content { width: 100%; height: 100%; display: flex; flex-direction: column; }
+        body { background: #333; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; font-family: sans-serif; }
+        
+        /* パスワード入力画面のスタイル */
+        #password-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 1000; color: white;
+        }
+        #password-overlay input {
+            padding: 10px; font-size: 1.2rem; border-radius: 5px; border: none; margin-top: 15px; text-align: center;
+        }
+        #password-overlay button {
+            margin-top: 15px; padding: 10px 20px; cursor: pointer; background: #555; color: white; border: none; border-radius: 5px;
+        }
+
+        /* 絵本本体のスタイル（最初は非表示） */
+        .container { display: none; width: 90vw; height: 90vh; justify-content: center; align-items: center; }
+        #my-book { box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .page { background-color: white; overflow: hidden; }
+        .page img { width: 100%; height: 100%; object-fit: contain; }
+        .white-page { background-color: white; width: 100%; height: 100%; }
     </style>
 </head>
 <body>
 
+<div id="password-overlay">
+    <h2>合言葉を設定してください</h2>
+    <input type="password" id="password-input" placeholder="数字2桁">
+    <button onclick="checkPassword()">読み始める</button>
+    <p id="error-msg" style="color: #ff6b6b; margin-top: 10px;"></p>
+</div>
+
 <div class="container" id="book-container">
     <div id="my-book">
-        <div class="page"><img src="images/page1.jpg" width="100%"></div>
-        <div class="page"><img src="images/page2.jpg" width="100%"></div>
-        <div class="page"><img src="images/page3.jpg" width="100%"></div>
-        </div>
+        <div class="page"><img src="image/omote.jpeg"></div>
+        <div class="page"><div class="white-page"></div></div>
+        <div class="page"><img src="image/0_タイトル.jpeg"></div>
+        <div class="page"><img src="image/1.jpeg"></div>
+        <div class="page"><img src="image/2.jpeg"></div>
+        <div class="page"><img src="image/3.jpeg"></div>
+        <div class="page"><img src="image/4.jpeg"></div>
+        <div class="page"><img src="image/5.jpeg"></div>
+        <div class="page"><img src="image/6.jpeg"></div>
+        <div class="page"><img src="image/7.jpeg"></div>
+        <div class="page"><img src="image/8.jpeg"></div>
+        <div class="page"><img src="image/9.jpeg"></div>
+        <div class="page"><img src="image/10.jpeg"></div>
+        <div class="page"><img src="image/11.jpeg"></div>
+        <div class="page"><img src="image/12.jpeg"></div>
+        <div class="page"><img src="image/13.jpeg"></div>
+        <div class="page"><img src="image/14.jpeg"></div>
+        <div class="page"><img src="image/15.jpeg"></div>
+        <div class="page"><img src="image/16.jpeg"></div>
+        <div class="page"><img src="image/17.jpeg"></div>
+        <div class="page"><img src="image/18.jpeg"></div>
+        <div class="page"><img src="image/19.jpeg"></div>
+        <div class="page"><img src="image/20.jpeg"></div>
+        <div class="page"><img src="image/21.jpeg"></div>
+        <div class="page"><img src="image/22.jpeg"></div>
+        <div class="page"><img src="image/okutsuki.jpeg"></div>
+        <div class="page"><div class="white-page"></div></div>
+        <div class="page"><img src="image/ura.jpeg"></div>
+    </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    function checkPassword() {
+        const input = document.getElementById('password-input').value;
+        const errorMsg = document.getElementById('error-msg');
+        
+        if (input === "60") {
+            // 正解ならパスワード画面を消して絵本を表示
+            document.getElementById('password-overlay').style.display = 'none';
+            document.getElementById('book-container').style.display = 'flex';
+            initBook(); // 絵本を初期化
+        } else {
+            errorMsg.innerText = "合言葉が違います。";
+        }
+    }
+
+    function initBook() {
         const pageFlip = new St.PageFlip(document.getElementById('my-book'), {
-            width: 550, // 1ページの幅
-            height: 733, // 1ページの高さ
+            width: 600, 
+            height: 600,
             size: "stretch",
             minWidth: 315,
             maxWidth: 1000,
             minHeight: 420,
             maxHeight: 1350,
             drawShadow: true,
-            showCover: true, // 表紙あり
-            usePortrait: true // スマホ等で1ページ表示を許可
+            showCover: true,
+            usePortrait: true,
+            flippingTime: 1000
         });
-
         pageFlip.loadFromHTML(document.querySelectorAll('.page'));
-    });
+    }
 </script>
 </body>
 </html>
