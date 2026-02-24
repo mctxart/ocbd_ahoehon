@@ -24,9 +24,38 @@
         /* 絵本本体のスタイル（最初は非表示） */
         .container { display: none; width: 90vw; height: 90vh; justify-content: center; align-items: center; }
         #my-book { box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        .page { background-color: white; overflow: hidden; }
-        .page img { width: 100%; height: 100%; object-fit: contain; }
-        .white-page { background-color: white; width: 100%; height: 100%; }
+        .page {
+            background-color: #fdfdfd; /* 真っ白より少し温かみのある白 */
+            overflow: hidden;
+            position: relative;
+        }
+        /* 画像自体の調整 */
+        .page img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            /* 画像を少し紙に馴染ませる */
+            mix-blend-mode: multiply; 
+            filter: sepia(5%) contrast(95%); /* わずかに古紙風の温かみを足す */
+        }
+        .white-page {
+            background-color: #fcfaf2; /* 少し生成り色に近い白 */
+            width: 100%;
+            height: 100%;
+        }
+        /* 画用紙の質感を出すためのオーバーレイ */
+        .page::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* クリックを邪魔しない */
+            /* 非常に細かいノイズを重ねて凹凸感を出す */
+            background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+            opacity: 0.2; /* ざらつきの強さ（お好みで調整） */
+        }
     </style>
 </head>
 <body>
@@ -91,14 +120,18 @@
             width: 600, 
             height: 600,
             size: "stretch",
-            minWidth: 315,
-            maxWidth: 1000,
-            minHeight: 420,
-            maxHeight: 1350,
-            drawShadow: true,
+            // minWidth: 315,
+            // maxWidth: 1000,
+            // minHeight: 420,
+            // maxHeight: 1350,
+            // --- 画用紙感を出すための設定 ---
+            drawShadow: true,      // 影をしっかり描画
+            flippingTime: 1200,    // めくる時間を少し長く（1.2秒）して重みを出す
+            startPage: 0,
             showCover: true,
             usePortrait: true,
-            flippingTime: 1000
+            maxShadowOpacity: 0.3, // 影を少し濃いめにして立体感を出す
+            mobileScrollSupport: false
         });
         pageFlip.loadFromHTML(document.querySelectorAll('.page'));
     }
