@@ -20,6 +20,22 @@
         #password-overlay button {
             margin-top: 15px; padding: 10px 20px; cursor: pointer; background: #555; color: white; border: none; border-radius: 5px;
         }
+        
+        /* ローディング画面のスタイル */
+        #loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 1001; color: white;
+            font-size: 1.5rem;
+        }
+        .loading-spinner {
+            margin-top: 30px; width: 50px; height: 50px; border: 4px solid #444;
+            border-top: 4px solid white; border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
         /* 絵本本体のスタイル（最初は非表示） */
         .container { display: none; width: 90vw; height: 90vh; justify-content: center; align-items: center; }
@@ -56,6 +72,16 @@
             background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
             opacity: 0.2; /* ざらつきの強さ（お好みで調整） */
         }
+        
+        /* スマートフォンでのページめくり時のズレを防止 */
+        #my-book {
+            touch-action: none;
+        }
+        html, body {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -65,6 +91,11 @@
     <input type="password" id="password-input">
     <button onclick="checkPassword()">読み始める</button>
     <p id="error-msg" style="color: #ff6b6b; margin-top: 10px;"></p>
+</div>
+
+<div id="loading-overlay" style="display: none;">
+    <p>読み込んでいます...</p>
+    <div class="loading-spinner"></div>
 </div>
 
 <div class="container" id="book-container">
@@ -106,8 +137,9 @@
         const errorMsg = document.getElementById('error-msg');
         
         if (input === "60") {
-            // 正解ならパスワード画面を消して絵本を表示
+            // 正解ならパスワード画面を消して読み込み画面を表示
             document.getElementById('password-overlay').style.display = 'none';
+            document.getElementById('loading-overlay').style.display = 'flex';
             document.getElementById('book-container').style.display = 'flex';
             initBook(); // 絵本を初期化
         } else {
@@ -131,9 +163,49 @@
             showCover: true,
             usePortrait: true,
             maxShadowOpacity: 0.3, // 影を少し濃いめにして立体感を出す
-            mobileScrollSupport: false
+            mobileScrollSupport: true
         });
         pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+        
+        // すべての画像の読み込み完了を待つ
+        const images = document.querySelectorAll('.page img');
+        let loadedCount = 0;
+        const totalCount = images.length;
+        
+        if (totalCount === 0) {
+            // 画像がない場合は即座に読み込み画面を非表示にする
+            document.getElementById('loading-overlay').style.display = 'none';
+        } else {
+            images.forEach(img => {
+                if (img.complete) {
+                    // すでに読み込まれている場合
+                    loadedCount++;
+                    if (loadedCount === totalCount) {
+                        document.getElementById('loading-overlay').style.display = 'none';
+                    }
+                } else {
+                    // 読み込み完了時のイベントリスナー
+                    img.addEventListener('load', () => {
+                        loadedCount++;
+                        if (loadedCount === totalCount) {
+                            document.getElementById('loading-overlay').style.display = 'none';
+                        }
+                    });
+                    // エラー時も次へ進む
+                    img.addEventListener('error', () => {
+                        loadedCount++;
+                        if (loadedCount === totalCount) {
+                            document.getElementById('loading-overlay').style.display = 'none';
+                        }
+                    });
+                }
+            });
+        }
+        
+        // スマートフォンでのページめくり時のズレを防止
+        document.getElementById('my-book').addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
     }
 </script>
 </body>
