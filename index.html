@@ -6,60 +6,139 @@
     <title>月を呑むへび</title>
     <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
     <style>
-        body { background: #333; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; font-family: sans-serif; }
-        
-        /* パスワード入力画面のスタイル */
-        #password-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9); display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 1000; color: white;
-        }
-        #password-overlay input {
-            padding: 10px; font-size: 1.2rem; border-radius: 5px; border: none; margin-top: 15px; text-align: center;
-        }
-        #password-overlay button {
-            margin-top: 15px; padding: 10px 20px; cursor: pointer; background: #555; color: white; border: none; border-radius: 5px;
-        }
-        
-        /* ローディング画面のスタイル */
-        #loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9); display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 1001; color: white;
-            font-size: 1.5rem;
-        }
-        .loading-spinner {
-            margin-top: 30px; width: 50px; height: 50px; border: 4px solid #444;
-            border-top: 4px solid white; border-radius: 50%; animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* ========== グローバルスタイル ========== */
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            font-family: sans-serif;
         }
 
-        /* 絵本本体のスタイル（最初は非表示） */
-        .container { display: none; width: 90vw; height: 90vh; justify-content: center; align-items: center; }
-        #my-book { box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        body {
+            background: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* ========== パスワード入力画面 ========== */
+        #password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+        }
+
+        #password-overlay input {
+            padding: 10px;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            border: none;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        #password-overlay button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #555;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        /* ========== ローディング画面 ========== */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .loading-spinner {
+            margin-top: 30px;
+            width: 50px;
+            height: 50px;
+            border: 4px solid #444;
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-message {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #aaa;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ========== 絵本コンテナ ========== */
+        .container {
+            display: none;
+            width: 90vw;
+            height: 90vh;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #my-book {
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            touch-action: none;
+        }
+
+        /* ========== ページスタイル ========== */
         .page {
-            background-color: #fdfdfd; /* 真っ白より少し温かみのある白 */
+            background-color: #fdfdfd;
             overflow: hidden;
             position: relative;
         }
-        /* 画像自体の調整 */
+
         .page img {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            /* 画像を少し紙に馴染ませる */
-            mix-blend-mode: multiply; 
-            filter: sepia(5%) contrast(95%); /* わずかに古紙風の温かみを足す */
+            mix-blend-mode: multiply;
+            filter: sepia(5%) contrast(95%);
         }
+
         .white-page {
-            background-color: #fcfaf2; /* 少し生成り色に近い白 */
+            background-color: #fcfaf2;
             width: 100%;
             height: 100%;
         }
-        /* 画用紙の質感を出すためのオーバーレイ */
+
+        /* ページの質感表現 */
         .page::after {
             content: "";
             position: absolute;
@@ -67,20 +146,51 @@
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none; /* クリックを邪魔しない */
-            /* 非常に細かいノイズを重ねて凹凸感を出す */
+            pointer-events: none;
             background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
-            opacity: 0.2; /* ざらつきの強さ（お好みで調整） */
+            opacity: 0.2;
         }
-        
-        /* スマートフォンでのページめくり時のズレを防止 */
-        #my-book {
-            touch-action: none;
-        }
-        html, body {
-            overflow: hidden;
-            position: fixed;
-            width: 100%;
+
+        /* ========== 横向き時の調整 ========== */
+        @media (orientation: landscape) {
+            #password-overlay,
+            #loading-overlay {
+                padding: 20px;
+                overflow-y: auto;
+            }
+
+            #password-overlay h2 {
+                margin: 10px 0;
+                font-size: 1.2rem;
+            }
+
+            #password-overlay input {
+                margin-top: 10px;
+                font-size: 1rem;
+            }
+
+            #password-overlay button {
+                margin-top: 10px;
+                padding: 8px 15px;
+            }
+
+            #loading-overlay p {
+                margin: 10px 0;
+                font-size: 1.2rem;
+            }
+
+            .loading-spinner {
+                margin-top: 15px;
+                width: 40px;
+                height: 40px;
+                border: 3px solid #444;
+                border-top: 3px solid white;
+            }
+
+            .loading-message {
+                margin-top: 15px;
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
@@ -96,6 +206,7 @@
 <div id="loading-overlay" style="display: none;">
     <p>読み込んでいます...</p>
     <div class="loading-spinner"></div>
+    <div class="loading-message">スマホやタブレットの場合は、<br>画面を横向きにして読んでネ^^</div>
 </div>
 
 <div class="container" id="book-container">
@@ -132,77 +243,89 @@
 </div>
 
 <script>
+    const PASSWORD = "60";
+    const PAGE_FLIP_CONFIG = {
+        width: 600,
+        height: 600,
+        size: "stretch",
+        minWidth: 315,
+        maxWidth: 1000,
+        minHeight: 315,
+        maxHeight: 1000,
+        margin: 10,
+        drawShadow: true,
+        flippingTime: 1000,
+        startPage: 0,
+        showCover: true,
+        usePortrait: true,
+        maxShadowOpacity: 0.3,
+        mobileScrollSupport: true
+    };
+
+    /**
+     * パスワードチェックと絵本初期化
+     */
     function checkPassword() {
         const input = document.getElementById('password-input').value;
         const errorMsg = document.getElementById('error-msg');
-        
-        if (input === "60") {
-            // 正解ならパスワード画面を消して読み込み画面を表示
+
+        if (input === PASSWORD) {
             document.getElementById('password-overlay').style.display = 'none';
             document.getElementById('loading-overlay').style.display = 'flex';
             document.getElementById('book-container').style.display = 'flex';
-            initBook(); // 絵本を初期化
+            initBook();
         } else {
             errorMsg.innerText = "合言葉が違います。";
         }
     }
 
-    function initBook() {
-        const pageFlip = new St.PageFlip(document.getElementById('my-book'), {
-            width: 600, 
-            height: 600,
-            size: "stretch",
-            minWidth: 315,
-            maxWidth: 1000,
-            minHeight: 420,
-            maxHeight: 1350,
-            // --- 画用紙感を出すための設定 ---
-            drawShadow: true,      // 影をしっかり描画
-            flippingTime: 1100,    // めくる時間を少し長く（1.1秒）して重みを出す
-            startPage: 0,
-            showCover: true,
-            usePortrait: true,
-            maxShadowOpacity: 0.3, // 影を少し濃いめにして立体感を出す
-            mobileScrollSupport: true
-        });
-        pageFlip.loadFromHTML(document.querySelectorAll('.page'));
-        
-        // すべての画像の読み込み完了を待つ
+    /**
+     * 画像の読み込み完了を待つ
+     */
+    function waitForImagesLoaded(callback) {
         const images = document.querySelectorAll('.page img');
         let loadedCount = 0;
         const totalCount = images.length;
-        
+
         if (totalCount === 0) {
-            // 画像がない場合は即座に読み込み画面を非表示にする
-            document.getElementById('loading-overlay').style.display = 'none';
-        } else {
-            images.forEach(img => {
-                if (img.complete) {
-                    // すでに読み込まれている場合
-                    loadedCount++;
-                    if (loadedCount === totalCount) {
-                        document.getElementById('loading-overlay').style.display = 'none';
-                    }
-                } else {
-                    // 読み込み完了時のイベントリスナー
-                    img.addEventListener('load', () => {
-                        loadedCount++;
-                        if (loadedCount === totalCount) {
-                            document.getElementById('loading-overlay').style.display = 'none';
-                        }
-                    });
-                    // エラー時も次へ進む
-                    img.addEventListener('error', () => {
-                        loadedCount++;
-                        if (loadedCount === totalCount) {
-                            document.getElementById('loading-overlay').style.display = 'none';
-                        }
-                    });
-                }
-            });
+            callback();
+            return;
         }
-        
-        // スマートフォンでのページめくり時のズレを防止
+
+        images.forEach(img => {
+            const onLoadComplete = () => {
+                loadedCount++;
+                if (loadedCount === totalCount) {
+                    callback();
+                }
+            };
+
+            if (img.complete) {
+                onLoadComplete();
+            } else {
+                img.addEventListener('load', onLoadComplete);
+                img.addEventListener('error', onLoadComplete);
+            }
+        });
+    }
+
+    /**
+     * 絵本を初期化
+     */
+    function initBook() {
+        const pageFlip = new St.PageFlip(
+            document.getElementById('my-book'),
+            PAGE_FLIP_CONFIG
+        );
+
+        pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+
+        // すべての画像読み込み完了時にローディング画面を非表示
+        waitForImagesLoaded(() => {
+            document.getElementById('loading-overlay').style.display = 'none';
+        });
+
+        // タッチスクロール防止
         document.getElementById('my-book').addEventListener('touchmove', (e) => {
             e.preventDefault();
         }, { passive: false });
