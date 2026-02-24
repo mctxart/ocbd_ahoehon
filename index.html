@@ -185,7 +185,7 @@
             opacity: 0.3;
             /* 内側の微かな陰影でページの厚みを表現 */
             box-shadow: inset 0 30px 40px rgba(0,0,0,0.04), inset 0 -30px 40px rgba(0,0,0,0.03);
-            mix-blend-mode: overlay;
+            mix-blend-mode: soft-light;
         }
 
         /* ========== 横向き時の調整 ========== */
@@ -229,28 +229,6 @@
                 font-size: 0.8rem;
             }
         }
-
-        /* ========== 枠外メッセージ ========== */
-        .margin-message {
-            position: fixed;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 12px;
-            color: rgba(0, 0, 0, 0.4);
-            font-weight: bold;
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-            pointer-events: none;
-            z-index: 100;
-            white-space: nowrap;
-            letter-spacing: 8px;
-        }
-        #margin-left {
-            left: 10px;
-        }
-        #margin-right {
-            right: 10px;
-        }
     </style>
 </head>
 <body>
@@ -265,13 +243,10 @@
 <div id="loading-overlay" style="display: none;">
     <p>読み込んでいます...</p>
     <div class="loading-spinner"></div>
-    <div class="loading-message">タブレット端末おすすめです！<br>(スマホだと画面からはみ出るかもしれん..)</div>
+    <div class="loading-message">タブレットおすすめです！<br>(スマホだと画面からはみ出るかもしれん..)</div>
 </div>
 
 <div class="container" id="book-container">
-    <!-- 枠外無断転載禁止メッセージ -->
-    <div class="margin-message" id="margin-left">DO NOT REPOST</div>
-    <div class="margin-message" id="margin-right">DO NOT REPOST</div>
     <div id="my-book">
         <div class="page"><img src="image/omote.jpeg"></div>
         <div class="page"><div class="white-page"></div></div>
